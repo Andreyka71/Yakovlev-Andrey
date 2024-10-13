@@ -23,6 +23,5 @@ public class Main {
     String result = context.sort(list, numberOfSort);
     result = context.sort(list, numberOfSort);
     System.out.println(result);
-    result = context.sort(list, numberOfSort);
   }
 }

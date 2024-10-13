@@ -22,4 +22,16 @@ public class SortTest {
     result = context.sort(list, numberOfSort);
     assertEquals("Ошибка! Неправильный индекс сортировки.", result);
   }
+  @Test
+  public void testСorrectSort() {
+    List<SortStrategy> strategies = new ArrayList<>();
+    strategies.add(new BubbleSort());
+    strategies.add(new MergeSort());
+    int strategyIndex = 1;
+    List<Integer> list = Arrays.asList(3, 2, 1);
+    Sort sort = new Sort(strategies);
+    String result = sort.sort(list, strategyIndex);
+    assertEquals("Отсортированный список: " + "[1, 2, 3]" , result);
+
+  }
 }

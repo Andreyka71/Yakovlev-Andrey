@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BubbleSort implements SortStrategy {
-  private static final int MAX_SIZE = 100;
+  static final int MAX_SIZE = 100;
   public List<Integer> sort(List<Integer> list) throws Exception {
     if (list.size() > MAX_SIZE) {
       throw new Exception("Ошибка! Превышено количество элементов для этой сортировки!");
