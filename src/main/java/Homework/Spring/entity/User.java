@@ -1,22 +1,17 @@
 package Homework.Spring.entity;
 
-public class User {
+import java.io.Serializable;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class User implements Serializable {
+    private Long id;
     private String login;
     private String password;
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+    private TelegramToken telegramToken;
+    private List<Device> devices;
 }
