@@ -14,8 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
 
+    private int counter = 0;
+
     @Before("execution(* Homework.Spring.controller..*(..))")
     public void logMethodName(JoinPoint joinPoint) {
+        counter++;
         System.out.println("Вызвался метод: " + joinPoint.getSignature().getName());
     }
 
@@ -28,5 +31,9 @@ public class LoggingAspect {
         long executionTime = Duration.between(start, end).toMillis();
         System.out.println("Время выполнения: " + executionTime + "ms");
         return proceed;
+    }
+
+    public int getCounter() {
+        return counter;
     }
 }

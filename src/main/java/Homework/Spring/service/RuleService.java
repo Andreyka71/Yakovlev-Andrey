@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,6 +28,7 @@ public class RuleService {
     private final DevicesRepository deviceRepository;
     private final RulesRepository ruleRepository;
 
+    @Async
     public RuleResponse applyRule(RuleRequest ruleRequest) {
         Optional<User> optionalUser = userRepository.findById(ruleRequest.getUserId());
         User user = new User();

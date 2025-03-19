@@ -6,6 +6,7 @@ import Homework.Spring.dto.response.UserResponse;
 import Homework.Spring.entity.Device;
 import Homework.Spring.entity.TelegramToken;
 import Homework.Spring.entity.User;
+import Homework.Spring.exeption.CustomException;
 import Homework.Spring.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import java.util.Optional;
 import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,7 +33,7 @@ public class UserService {
         if (!checkUserExistence(user)) {
             return buildUserResponse(userRepository.addUser(user));
         } else {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь уже существует");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
         }
     }
 
@@ -49,14 +52,19 @@ public class UserService {
         return userResponse.getDevices();
     }
 
+    /**
+     * Этот метод обеспечивает гарантию повторных попыток при возникновении CustomException,
+     * чтобы избежать сбоев в работе прогрммы и гарантировать обновление пользователя
+     */
+    @Retryable(value = CustomException.class, maxAttempts = 5, backoff = @Backoff(delay = 10000))
     public UserResponse updateUser(UserRequest userRequest) {
-        Optional<User> optionalUser  = userRepository.findById(userRequest.getId());
+        Optional<User> optionalUser = userRepository.findById(userRequest.getId());
         
-        if (!optionalUser .isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        if (!optionalUser.isPresent()) {
+            throw new CustomException("Пользователь не найден");
         }
     
-        User user = optionalUser .get();
+        User user = optionalUser.get();
         if (userRequest.getLogin() != null) {
             user.setLogin(userRequest.getLogin());
         }
@@ -77,7 +85,7 @@ public class UserService {
     public UserResponse fullUpdateUser(UserRequest userRequest) {
         Optional<User> optionalUser  = userRepository.findById(userRequest.getId());
         
-        if (!optionalUser .isPresent()) {
+        if (!optionalUser.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 

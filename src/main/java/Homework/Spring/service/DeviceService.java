@@ -8,13 +8,15 @@ import Homework.Spring.entity.Rule;
 import Homework.Spring.entity.User;
 import Homework.Spring.repository.DevicesRepository;
 import Homework.Spring.repository.UsersRepository;
-
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,8 +28,15 @@ public class DeviceService {
     private final DevicesRepository deviceRepository;
     private final UsersRepository userRepository;
     private final RuleService ruleService;
-        
-    public DeviceResponse addDevice(DeviceRequest deviceRequest) {
+
+    /**
+     * Этот метод обеспечивает выполнение операции добавления устройства ровно один раз
+     * Используется synchronized, чтобы гарантировать, что два потока не могут одновременно
+     * добавить одного и тоже устройство. Если устройство уже существует, метод не будет
+     * добавлять его повторно.
+     */
+    @CachePut(value = "devices", key = "#deviceRequest.id")
+    public synchronized DeviceResponse addDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findById(deviceRequest.getUserId());
         User user = new User();
         if (optionalUser.isPresent()) {
@@ -42,6 +51,7 @@ public class DeviceService {
         return deviceResponse;
     }
 
+    @CacheEvict(value = "devices", key = "#deviceRequest.id")
     public DeviceResponse deleteDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findById(deviceRequest.getUserId());
         User user = new User();
@@ -64,6 +74,7 @@ public class DeviceService {
         return deviceResponse;
     }
 
+    @Cacheable(value = "devices", key = "#deviceRequest.id")
     public List<RuleResponse> getDeviceRules(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findById(deviceRequest.getUserId());
         User user = new User();
@@ -88,6 +99,7 @@ public class DeviceService {
         return deviceResponse.getRules();
     }
 
+    @CachePut(value = "devices", key = "#deviceRequest.id")
     public DeviceResponse updateDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findById(deviceRequest.getUserId());
         User user = new User();
@@ -118,6 +130,7 @@ public class DeviceService {
         return buildDeviceResponse(device);
     }
 
+    @Cacheable(value = "devices", key = "#deviceRequest.id")
     public DeviceResponse fullUpdateDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findById(deviceRequest.getUserId());
         User user = new User();
@@ -175,5 +188,4 @@ public class DeviceService {
         device.setUser(user);
         return device;
     }
-
 }
