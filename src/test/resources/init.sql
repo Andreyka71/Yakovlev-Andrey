@@ -1,0 +1,15 @@
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE devices (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    device_name VARCHAR(100),
+    type VARCHAR(100),
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

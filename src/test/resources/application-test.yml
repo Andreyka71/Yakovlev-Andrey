@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: homework1
+server:
+  port: 0
+  tomcat:
+    threads:
+      min-spare: 10
+      max: 50
